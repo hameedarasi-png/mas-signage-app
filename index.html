@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#183b36">
+<title>حميد للإعلان والديكور</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--green:#183b36;--gold:#d7b778;--bg:#f3f5f4;--ink:#1c2926;--muted:#687772;--line:#dfe6e2;--white:#fff;--red:#a53030}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Tahoma,Arial,sans-serif;color:var(--ink);line-height:1.55}
+header{background:var(--green);color:white;padding:22px 16px 18px;border-bottom:4px solid var(--gold)}
+.head{max-width:900px;margin:auto;display:flex;align-items:center;gap:14px}.logo{width:56px;height:56px;border-radius:14px;background:var(--gold);color:var(--green);display:grid;place-items:center;font-weight:bold;font-size:24px}
+h1{font-size:21px;margin:0 0 4px}header p{margin:0;color:#eee5d2;font-size:13px}
+main{max-width:900px;margin:18px auto;padding:0 12px 30px}.tabs{display:flex;gap:8px;margin-bottom:14px}.tabs button{flex:1}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #183b3608}
+h2{font-size:17px;margin:0 0 13px}h3{font-size:15px;margin:0}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+input,select,textarea{width:100%;border:1px solid #ccd7d1;border-radius:10px;padding:11px;font:inherit;background:#fff;color:var(--ink);min-width:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{margin-bottom:12px}
+button{font:inherit;border:0;border-radius:10px;padding:11px 13px;background:var(--green);color:white;cursor:pointer}
+button.secondary{background:#e8eeeb;color:var(--green)}button.gold{background:var(--gold);color:#24332e}button.danger{background:#f8e9e8;color:var(--red)}button.small{padding:7px 10px;font-size:12px}
+.service-row{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.service-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.row-total{display:flex;justify-content:space-between;background:#f1f5f2;padding:9px 11px;border-radius:9px;margin-top:10px;font-size:13px}
+.totalbox{background:#edf4ef;border-radius:13px;padding:14px}.big{font-size:25px;font-weight:bold;color:var(--green)}
+.summary-line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line)}.summary-line:last-child{border:0}
+.muted{color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+.invoice{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0;background:#fff}.invoice-head{display:flex;justify-content:space-between;gap:8px;align-items:start}
+.empty{text-align:center;padding:22px;color:var(--muted)}
+.hidden{display:none!important}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr;gap:8px}.card{padding:13px}h1{font-size:18px}.head{gap:10px}.logo{width:48px;height:48px}}
+@media print{body{background:white}header,.tabs,.no-print,#editor,#history-controls{display:none!important}main{max-width:none;margin:0;padding:0}.card{border:0;box-shadow:none;padding:0}.print-only{display:block!important}.invoice-print{display:block!important}}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="logo">ح</div><div><h1>حميد للإعلان والديكور</h1><p>إدارة العملاء والفواتير · 774457333</p></div></div></header>
+<main>
+<div class="tabs no-print"><button id="tabNew" onclick="showTab('new')">＋ فاتورة جديدة</button><button class="secondary" id="tabHistory" onclick="showTab('history')">الفواتير المحفوظة</button></div>
+<section id="editor">
+<div class="card">
+<h2>١. بيانات العميل</h2>
+<div class="grid">
+<div class="field"><label for="customer">اسم العميل</label><input id="customer" placeholder="اسم العميل"></div>
+<div class="field"><label for="phone">رقم جوال العميل</label><input id="phone" type="tel" placeholder="رقم الجوال"></div>
+</div>
+<div class="grid">
+<div class="field"><label for="date">تاريخ الفاتورة</label><input id="date" type="date"></div>
+<div class="field"><label for="invoiceNo">رقم الفاتورة</label><input id="invoiceNo" readonly></div>
+</div>
+</div>
+<div class="card">
+<h2>٢. تفاصيل الأعمال</h2>
+<div id="items"></div>
+<button class="secondary" onclick="addItem()">＋ إضافة بند</button>
+</div>
+<div class="card">
+<h2>٣. المدفوعات والحساب</h2>
+<div class="grid">
+<div class="field"><label for="paid">المبلغ المدفوع (ريال)</label><input id="paid" type="number" min="0" value="0" oninput="updateTotals()"></div>
+<div class="field"><label for="notes">ملاحظات</label><input id="notes" placeholder="موعد التسليم أو ملاحظات"></div>
+</div>
+<div class="totalbox">
+<div class="summary-line"><span>إجمالي الفاتورة</span><strong id="total">0 ريال</strong></div>
+<div class="summary-line"><span>المدفوع</span><strong id="paidView">0 ريال</strong></div>
+<div class="summary-line"><span>المتبقي</span><strong class="big" id="remaining">0 ريال</strong></div>
+</div>
+<div class="actions no-print" style="margin-top:14px">
+<button onclick="saveInvoice()">حفظ الفاتورة</button><button class="gold" onclick="printCurrent()">طباعة / حفظ PDF</button>
+<button class="secondary" onclick="resetForm()">فاتورة جديدة</button>
+</div>
+<p class="muted">تُحفظ الفواتير على هذا الجهاز. استخدم النسخة الاحتياطية لحفظ نسخة إضافية من بياناتك.</p>
+</div>
+</section>
+<section id="history" class="hidden">
+<div class="card">
+<h2>الفواتير المحفوظة</h2>
+<div id="history-controls" class="actions"><button class="secondary" onclick="exportData()">تصدير نسخة احتياطية</button><button class="secondary" onclick="document.getElementById('importFile').click()">استيراد نسخة</button><input class="hidden" type="file" id="importFile" accept="application/json" onchange="importData(event)"></div>
+<div id="invoiceList"></div>
+</div>
+</section>
+<section id="printArea" class="hidden"></section>
+</main>
+<script>
+const SERVICES=["كلادينج","حروف بارزة أكريلك","حروف استيل","حروف فوركس","قص روتر","قص ليزر","طباعة فلكس","طباعة بنر","طباعة أقلام","عمل أكريلك"];
+const KEY="hameed_ads_invoices_v1";
+let currentItems=[];
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(Number(n)||0).toLocaleString("en-US")+" ريال";
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function allInvoices(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}}
+function setInvoices(a){localStorage.setItem(KEY,JSON.stringify(a))}
+function nextNo(){return "HAD-"+String(Date.now()).slice(-8)}
+function showTab(t){$("editor").classList.toggle("hidden",t!=="new");$("history").classList.toggle("hidden",t!=="history");$("tabNew").className=t==="new"?"":"secondary";$("tabHistory").className=t==="history"?"":"secondary";if(t==="history")renderHistory()}
+function addItem(data={}){currentItems.push({service:data.service||SERVICES[0],size:data.size??"",price:data.price??"",unit:data.unit||"متر"});renderItems()}
+function removeItem(i){currentItems.splice(i,1);if(!currentItems.length)addItem();else renderItems()}
+function renderItems(){
+$("items").innerHTML=currentItems.map((x,i)=>`<div class="service-row">
+<div class="service-top"><h3>بند ${i+1}</h3><button class="danger small" onclick="removeItem(${i})">حذف</button></div>
+<div class="field"><label>نوع الخدمة</label><select onchange="currentItems[${i}].service=this.value">${SERVICES.map(s=>`<option ${s===x.service?"selected":""}>${s}</option>`).join("")}</select></div>
+<div class="grid">
+<div class="field"><label>المقاس / الكمية</label><input type="number" min="0" step="any" value="${esc(x.size)}" placeholder="مثال 12.5" oninput="currentItems[${i}].size=this.value;updateTotals()"></div>
+<div class="field"><label>الوحدة</label><select onchange="currentItems[${i}].unit=this.value;renderItems()"><option ${x.unit==="متر"?"selected":""}>متر</option><option ${x.unit==="متر مربع"?"selected":""}>متر مربع</option><option ${x.unit==="حبة"?"selected":""}>حبة</option><option ${x.unit==="قطعة"?"selected":""}>قطعة</option><option ${x.unit==="مقطوعية"?"selected":""}>مقطوعية</option></select></div>
+</div>
+<div class="field"><label>سعر الوحدة (ريال)</label><input type="number" min="0" step="any" value="${esc(x.price)}" placeholder="السعر" oninput="currentItems[${i}].price=this.value;updateTotals()"></div>
+<div class="row-total"><span>إجمالي البند</span><strong>${fmt((Number(x.size)||0)*(Number(x.price)||0))}</strong></div>
+</div>`).join("");
+updateTotals()
+}
+function totalValue(){return currentItems.reduce((s,x)=>s+(Number(x.size)||0)*(Number(x.price)||0),0)}
+function updateTotals(){
+let total=totalValue(),paid=Number($("paid").value)||0;
+$("total").textContent=fmt(total);$("paidView").textContent=fmt(paid);$("remaining").textContent=fmt(total-paid);
+document.querySelectorAll(".row-total strong").forEach((el,i)=>{if(currentItems[i])el.textContent=fmt((Number(currentItems[i].size)||0)*(Number(currentItems[i].price)||0))})
+}
+function formData(){return {id:$("invoiceNo").value||nextNo(),customer:$("customer").value.trim(),phone:$("phone").value.trim(),date:$("date").value,items:currentItems.map(x=>({...x})),paid:Number($("paid").value)||0,notes:$("notes").value.trim(),total:totalValue(),createdAt:new Date().toISOString()}}
+function saveInvoice(){
+let inv=formData();if(!inv.customer){alert("يرجى إدخال اسم العميل.");$("customer").focus();return}
+if(!inv.items.length){alert("أضف بند عمل واحداً على الأقل.");return}
+let all=allInvoices(),idx=all.findIndex(x=>x.id===inv.id);
+if(idx>=0){inv.createdAt=all[idx].createdAt;all[idx]=inv}else all.unshift(inv);
+setInvoices(all);alert("تم حفظ الفاتورة على هذا الجهاز.");$("invoiceNo").value=inv.id;renderHistory()
+}
+function resetForm(){
+$("customer").value="";$("phone").value="";$("paid").value="0";$("notes").value="";$("date").value=new Date().toISOString().slice(0,10);$("invoiceNo").value=nextNo();currentItems=[];addItem()
+}
+function printCurrent(){let inv=formData();if(!inv.customer){alert("يرجى إدخال اسم العميل قبل الطباعة.");return}
+const rows=inv.items.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.service)}</td><td>${esc(x.size)} ${esc(x.unit)}</td><td>${fmt(x.price)}</td><td>${fmt((Number(x.size)||0)*(Number(x.price)||0))}</td></tr>`).join("");
+$("printArea").innerHTML=`<div style="font-family:Tahoma,Arial;direction:rtl;color:#172a25;padding:20px"><div style="border-bottom:3px solid #183b36;padding-bottom:12px"><h1>حميد للإعلان والديكور</h1><div>هاتف: 774457333</div></div><h2 style="text-align:center;margin-top:20px">فاتورة أعمال</h2><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>رقم الفاتورة: ${esc(inv.id)}</span><span>التاريخ: ${esc(inv.date)}</span></div><p>اسم العميل: ${esc(inv.customer)}　 |　 رقم الجوال: ${esc(inv.phone)}</p><table style="width:100%;border-collapse:collapse;margin-top:16px"><thead><tr>${["م","نوع العمل","المقاس/الكمية","سعر الوحدة","الإجمالي"].map(t=>`<th style="border:1px solid #999;padding:8px;background:#edf4ef">${t}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table><div style="max-width:360px;margin:18px 0 0 auto"><p>إجمالي الفاتورة: <b>${fmt(inv.total)}</b></p><p>المدفوع: <b>${fmt(inv.paid)}</b></p><p style="font-size:20px">المتبقي: <b>${fmt(inv.total-inv.paid)}</b></p></div><p>ملاحظات: ${esc(inv.notes)}</p><div style="display:flex;justify-content:space-between;margin-top:50px"><span>توقيع العميل: ................</span><span>توقيع المحل: ................</span></div></div>`;
+$("printArea").classList.remove("hidden");window.print();setTimeout(()=>$("printArea").classList.add("hidden"),500)
+}
+function renderHistory(){
+let arr=allInvoices();$("invoiceList").innerHTML=arr.length?arr.map(inv=>`<div class="invoice"><div class="invoice-head"><div><strong>${esc(inv.customer)}</strong><div class="muted">${esc(inv.id)} · ${esc(inv.date||"")}</div><div style="margin-top:5px">الإجمالي: <b>${fmt(inv.total)}</b> · المتبقي: <b>${fmt(inv.total-(Number(inv.paid)||0))}</b></div></div><div class="actions"><button class="small" onclick="loadInvoice('${esc(inv.id)}')">فتح</button><button class="danger small" onclick="deleteInvoice('${esc(inv.id)}')">حذف</button></div></div></div>`).join(""):`<div class="empty">لا توجد فواتير محفوظة حتى الآن.</div>`
+}
+function loadInvoice(id){let x=allInvoices().find(v=>v.id===id);if(!x)return;showTab("new");$("customer").value=x.customer||"";$("phone").value=x.phone||"";$("date").value=x.date||"";$("invoiceNo").value=x.id;$("paid").value=x.paid||0;$("notes").value=x.notes||"";currentItems=(x.items||[]).map(v=>({...v}));if(!currentItems.length)addItem();else renderItems();window.scrollTo({top:0,behavior:"smooth"})}
+function deleteInvoice(id){if(!confirm("هل تريد حذف هذه الفاتورة؟"))return;setInvoices(allInvoices().filter(x=>x.id!==id));renderHistory()}
+function exportData(){let blob=new Blob([JSON.stringify(allInvoices(),null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="نسخة-فواتير-حميد.json";a.click();URL.revokeObjectURL(url)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let data=JSON.parse(r.result);if(!Array.isArray(data))throw Error();let old=allInvoices(),map=new Map(old.map(x=>[x.id,x]));data.forEach(x=>map.set(x.id,x));setInvoices([...map.values()]);renderHistory();alert("تم استيراد النسخة الاحتياطية.")}catch(err){alert("الملف غير صالح.")}};r.readAsText(f);e.target.value=""}
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+resetForm();
+</script>
+</body>
+</html>
